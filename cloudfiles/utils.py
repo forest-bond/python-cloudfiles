@@ -4,7 +4,6 @@ import re
 from urllib    import quote
 from urlparse  import urlparse
 from errors    import InvalidUrl
-from httplib   import HTTPConnection, HTTPSConnection
 
 
 def parse_url(url):
@@ -63,23 +62,3 @@ def unicode_quote(s):
         return quote(s.encode("utf-8"))
     else:
         return quote(str(s))
-
-
-class THTTPConnection(HTTPConnection):
-    def __init__(self, host, port, timeout):
-        HTTPConnection.__init__(self, host, port)
-        self.timeout = timeout
-
-    def connect(self):
-        HTTPConnection.connect(self)
-        self.sock.settimeout(self.timeout)
-
-
-class THTTPSConnection(HTTPSConnection):
-    def __init__(self, host, port, timeout):
-        HTTPSConnection.__init__(self, host, port)
-        self.timeout = timeout
-
-    def connect(self):
-        HTTPSConnection.connect(self)
-        self.sock.settimeout(self.timeout)

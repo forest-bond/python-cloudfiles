@@ -15,7 +15,7 @@ intances of CustomHTTPConnection.
 
 from sys import version_info
 if version_info[0] <= 2 and version_info[1] < 6:
-    from cloudfiles.utils import THTTPConnection as connbase
+    from cloudfiles.http import THTTPConnection as connbase
 else:
     from httplib import HTTPConnection as connbase
 

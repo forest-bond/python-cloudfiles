@@ -13,7 +13,8 @@ import  os
 from    urllib    import urlencode
 from    httplib   import HTTPSConnection, HTTPConnection, HTTPException
 from    container import Container, ContainerResults
-from    utils     import unicode_quote, parse_url, THTTPConnection, THTTPSConnection
+from    utils     import unicode_quote, parse_url
+from    http      import THTTPConnection, THTTPSConnection
 from    errors    import ResponseError, NoSuchContainer, ContainerNotEmpty, \
                          InvalidContainerName, CDNNotEnabled, ContainerExists
 from    Queue     import Queue, Empty, Full

@@ -9,7 +9,8 @@ See COPYING for license information.
 """
 
 from httplib  import HTTPSConnection, HTTPConnection
-from utils    import parse_url, THTTPConnection, THTTPSConnection
+from utils    import parse_url
+from http     import THTTPConnection, THTTPSConnection
 from errors   import ResponseError, AuthenticationError, AuthenticationFailed
 from consts   import user_agent, us_authurl, uk_authurl
 from sys      import version_info
