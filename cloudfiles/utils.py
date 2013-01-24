@@ -4,7 +4,7 @@ import re
 from urllib    import quote
 from urlparse  import urlparse
 from errors    import InvalidUrl
-from httplib   import HTTPConnection, HTTPSConnection, HTTP
+from httplib   import HTTPConnection, HTTPSConnection
 
 
 def parse_url(url):
@@ -75,13 +75,6 @@ class THTTPConnection(HTTPConnection):
         self.sock.settimeout(self.timeout)
 
 
-class THTTP(HTTP):
-    _connection_class = THTTPConnection
-
-    def set_timeout(self, timeout):
-        self._conn.timeout = timeout
-
-
 class THTTPSConnection(HTTPSConnection):
     def __init__(self, host, port, timeout):
         HTTPSConnection.__init__(self, host, port)
@@ -90,10 +83,3 @@ class THTTPSConnection(HTTPSConnection):
     def connect(self):
         HTTPSConnection.connect(self)
         self.sock.settimeout(self.timeout)
-
-
-class THTTPS(HTTP):
-    _connection_class = THTTPSConnection
-
-    def set_timeout(self, timeout):
-        self._conn.timeout = timeout
