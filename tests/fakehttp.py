@@ -14,10 +14,7 @@ intances of CustomHTTPConnection.
 """
 
 from sys import version_info
-if version_info[0] <= 2 and version_info[1] < 6:
-    from cloudfiles.http import THTTPConnection as connbase
-else:
-    from httplib import HTTPConnection as connbase
+from cloudfiles.http import THTTPConnection
 
 import StringIO
 
@@ -264,13 +261,13 @@ class TrackerSocket(FakeSocket):
         self._wbuffer.seek(0)
         return self._wbuffer
 
-class CustomHTTPConnection(connbase):
+class CustomHTTPConnection(THTTPConnection):
     def connect(self):
         self.sock = TrackerSocket()
 
     def send(self, data):
         self._wbuffer = data
-        connbase.send(self, data)
+        THTTPConnection.send(self, data)
 
 if __name__ == '__main__':
     conn = CustomHTTPConnection('localhost', 8000)

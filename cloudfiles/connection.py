@@ -11,7 +11,7 @@ See COPYING for license information.
 import  socket
 import  os
 from    urllib    import urlencode
-from    httplib   import HTTPSConnection, HTTPConnection, HTTPException
+from    httplib   import HTTPException
 from    container import Container, ContainerResults
 from    utils     import unicode_quote, parse_url
 from    http      import THTTPConnection, THTTPSConnection
@@ -22,7 +22,6 @@ from    time      import time
 import  consts
 from    authentication import Authentication
 from    fjson     import json_loads
-from    sys       import version_info
 # Because HTTPResponse objects *have* to have read() called on them
 # before they can be used again ...
 # pylint: disable-msg=W0612
@@ -91,13 +90,8 @@ class Connection(object):
         (url, self.cdn_url, self.token) = self.auth.authenticate()
         url = self._set_storage_url(url)
         self.connection_args = parse_url(url)
-
-        if version_info[0] <= 2 and version_info[1] < 6:
-            self.conn_class = self.connection_args[3] and THTTPSConnection or \
+        self.conn_class = self.connection_args[3] and THTTPSConnection or \
                                                               THTTPConnection
-        else:
-            self.conn_class = self.connection_args[3] and HTTPSConnection or \
-                                                              HTTPConnection
         self.http_connect()
         if self.cdn_url:
             self.cdn_connect()

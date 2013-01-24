@@ -8,12 +8,10 @@ and session tokens.
 See COPYING for license information.
 """
 
-from httplib  import HTTPSConnection, HTTPConnection
 from utils    import parse_url
 from http     import THTTPConnection, THTTPSConnection
 from errors   import ResponseError, AuthenticationError, AuthenticationFailed
 from consts   import user_agent, us_authurl, uk_authurl
-from sys      import version_info
 
 
 class BaseAuthentication(object):
@@ -29,11 +27,7 @@ class BaseAuthentication(object):
         self.headers['User-Agent'] = useragent
         self.timeout = timeout
         (self.host, self.port, self.uri, self.is_ssl) = parse_url(self.authurl)
-        if version_info[0] <= 2 and version_info[1] < 6:
-            self.conn_class = self.is_ssl and THTTPSConnection or \
-                THTTPConnection
-        else:
-            self.conn_class = self.is_ssl and HTTPSConnection or HTTPConnection
+        self.conn_class = self.is_ssl and THTTPSConnection or THTTPConnection
 
     def authenticate(self):
         """
