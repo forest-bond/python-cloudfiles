@@ -9,7 +9,7 @@ See COPYING for license information.
 """
 
 from utils    import parse_url
-from http     import THTTPConnection, THTTPSConnection
+from http     import CFHTTPConnection, CFHTTPSConnection
 from errors   import ResponseError, AuthenticationError, AuthenticationFailed
 from consts   import user_agent, us_authurl, uk_authurl
 
@@ -19,15 +19,16 @@ class BaseAuthentication(object):
     The base authentication class from which all others inherit.
     """
     def __init__(self, username, api_key, authurl=us_authurl, timeout=15,
-                 useragent=user_agent):
+                 keepalive=None, useragent=user_agent):
         self.authurl = authurl
         self.headers = dict()
         self.headers['x-auth-user'] = username
         self.headers['x-auth-key'] = api_key
         self.headers['User-Agent'] = useragent
         self.timeout = timeout
+        self.keepalive = keepalive
         (self.host, self.port, self.uri, self.is_ssl) = parse_url(self.authurl)
-        self.conn_class = self.is_ssl and THTTPSConnection or THTTPConnection
+        self.conn_class = self.is_ssl and CFHTTPSConnection or CFHTTPConnection
 
     def authenticate(self):
         """
@@ -57,7 +58,8 @@ class Authentication(BaseAuthentication):
         Initiates authentication with the remote service and returns a
         two-tuple containing the storage system URL and session token.
         """
-        conn = self.conn_class(self.host, self.port, timeout=self.timeout)
+        conn = self.conn_class(self.host, self.port, timeout=self.timeout,
+                               keepalive=self.keepalive)
         #conn = self.conn_class(self.host, self.port)
         conn.request('GET', '/' + self.uri, headers=self.headers)
         response = conn.getresponse()

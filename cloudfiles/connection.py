@@ -14,7 +14,7 @@ from    urllib    import urlencode
 from    httplib   import HTTPException
 from    container import Container, ContainerResults
 from    utils     import unicode_quote, parse_url
-from    http      import THTTPConnection, THTTPSConnection
+from    http      import CFHTTPConnection, CFHTTPSConnection
 from    errors    import ResponseError, NoSuchContainer, ContainerNotEmpty, \
                          InvalidContainerName, CDNNotEnabled, ContainerExists
 from    Queue     import Queue, Empty, Full
@@ -39,7 +39,8 @@ class Connection(object):
     @undocumented: _check_container_name
     """
 
-    def __init__(self, username=None, api_key=None, timeout=15, **kwargs):
+    def __init__(self, username=None, api_key=None, timeout=15,
+                 keepalive=None, **kwargs):
         """
         Accepts keyword arguments for Mosso username and api key.
         Optionally, you can omit these keywords and supply an
@@ -66,6 +67,7 @@ class Connection(object):
         self.servicenet = kwargs.get('servicenet', False)
         self.user_agent = kwargs.get('useragent', consts.user_agent)
         self.timeout = timeout
+        self.keepalive = keepalive
 
         # if the environement variable RACKSPACE_SERVICENET is set (to
         # anything) it will automatically set servicenet=True
@@ -79,7 +81,8 @@ class Connection(object):
             authurl = kwargs.get('authurl', consts.us_authurl)
             if username and api_key and authurl:
                 self.auth = Authentication(username, api_key, authurl=authurl,
-                            useragent=self.user_agent, timeout=self.timeout)
+                            useragent=self.user_agent, timeout=self.timeout,
+                            keepalive=self.keepalive)
             else:
                 raise TypeError("Incorrect or invalid arguments supplied")
         self._authenticate()
@@ -90,8 +93,8 @@ class Connection(object):
         (url, self.cdn_url, self.token) = self.auth.authenticate()
         url = self._set_storage_url(url)
         self.connection_args = parse_url(url)
-        self.conn_class = self.connection_args[3] and THTTPSConnection or \
-                                                              THTTPConnection
+        self.conn_class = self.connection_args[3] and CFHTTPSConnection or \
+                                                              CFHTTPConnection
         self.http_connect()
         if self.cdn_url:
             self.cdn_connect()
@@ -106,7 +109,8 @@ class Connection(object):
         Setup the http connection instance for the CDN service.
         """
         (host, port, cdn_uri, is_ssl) = parse_url(self.cdn_url)
-        self.cdn_connection = self.conn_class(host, port, timeout=self.timeout)
+        self.cdn_connection = self.conn_class(host, port, timeout=self.timeout,
+                                              keepalive=self.keepalive)
         self.cdn_enabled = True
 
     def http_connect(self):
@@ -114,8 +118,9 @@ class Connection(object):
         Setup the http connection instance.
         """
         (host, port, self.uri, is_ssl) = self.connection_args
-        self.connection = self.conn_class(host, port=port, \
-                                              timeout=self.timeout)
+        self.connection = self.conn_class(host, port=port,
+                                          timeout=self.timeout,
+                                          keepalive=self.keepalive)
         self.connection.set_debuglevel(self.debuglevel)
 
     def cdn_request(self, method, path=[], data='', hdrs=None):

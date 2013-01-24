@@ -14,7 +14,7 @@ intances of CustomHTTPConnection.
 """
 
 from sys import version_info
-from cloudfiles.http import THTTPConnection
+from cloudfiles.http import CFHTTPConnection
 
 import StringIO
 
@@ -261,13 +261,13 @@ class TrackerSocket(FakeSocket):
         self._wbuffer.seek(0)
         return self._wbuffer
 
-class CustomHTTPConnection(THTTPConnection):
+class CustomHTTPConnection(CFHTTPConnection):
     def connect(self):
         self.sock = TrackerSocket()
 
     def send(self, data):
         self._wbuffer = data
-        THTTPConnection.send(self, data)
+        CFHTTPConnection.send(self, data)
 
 if __name__ == '__main__':
     conn = CustomHTTPConnection('localhost', 8000)
